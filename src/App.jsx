@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AppLayout } from './components/Layout/AppLayout';
 import { Dashboard } from './pages/Dashboard';
 import { Markets } from './pages/Markets';
@@ -6,23 +6,27 @@ import { TradingPair } from './pages/TradingPair';
 import { OrderBookPage } from './pages/OrderBookPage';
 import { FeePromosPage } from './pages/FeePromosPage';
 import { FundingPage } from './pages/FundingPage';
-import './styles/global.css';
+import { PortfolioPage } from './pages/PortfolioPage';
+import { WatchlistPage } from './pages/WatchlistPage';
+import { AlertsPage } from './pages/AlertsPage';
+import { SimulatorPage } from './pages/SimulatorPage';
 
 function App() {
     return (
-        <Router>
-            <AppLayout>
-                <Routes>
-                    <Route path='/' element={<Dashboard />} />
-                    <Route path='/markets' element={<Markets />} />
-                    <Route path='/trading' element={<TradingPair />} />
-                    <Route path='/trading/:symbol' element={<TradingPair />} />
-                    <Route path='/orderbook' element={<OrderBookPage />} />
-                    <Route path='/fee-promos' element={<FeePromosPage />} />
-                    <Route path='/funding' element={<FundingPage />} />
-                </Routes>
-            </AppLayout>
-        </Router>
+        <AppLayout>
+            <Routes>
+                <Route path='/' element={<Dashboard />} />
+                <Route path='/markets' element={<Markets />} />
+                <Route path='/trading/:symbol?' element={<TradingPair />} />
+                <Route path='/orderbook' element={<OrderBookPage />} />
+                <Route path='/funding' element={<FundingPage />} />
+                <Route path='/fee-promos' element={<FeePromosPage />} />
+                <Route path='/portfolio' element={<PortfolioPage />} />
+                <Route path='/watchlist' element={<WatchlistPage />} />
+                <Route path='/alerts' element={<AlertsPage />} />
+                <Route path='/simulator' element={<SimulatorPage />} />
+            </Routes>
+        </AppLayout>
     );
 }
 

@@ -1,47 +1,66 @@
 import { useState, useMemo } from 'react';
-import { Box, Heading, Text, Input, InputGroup, InputLeftElement, Grid, HStack, VStack, Badge } from '@chakra-ui/react';
-import { Search } from 'lucide-react';
+import { Box, Heading, Text, Input, InputGroup, InputLeftElement, Grid, HStack, VStack, Badge, IconButton, useColorMode } from '@chakra-ui/react';
+import { Search, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { usePolling } from '@/hooks/useGeminiAPI';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useWatchlist } from '@/context/WatchlistContext';
 import { getAllPrices } from '@/api';
 import { LoadingSpinner } from '@/components/Common/LoadingSpinner';
 import { Card } from '@/components/Common/Card';
 import { PriceBadge } from '@/components/Common/PriceBadge';
+import { RefreshIndicator } from '@/components/Common/RefreshIndicator';
 import { formatCurrency } from '@/utils/formatters';
 import { REFRESH_INTERVALS } from '@/utils/constants';
 
 const MotionBox = motion(Box);
 
-const MarketRow = ({ pair, price, change, onClick }) => {
+const MarketRow = ({ pair, price, change, onClick, isInWatchlist, onToggleWatchlist }) => {
+    const { colorMode } = useColorMode();
     const isPositive = parseFloat(change) > 0;
 
     return (
-        <Card hover onClick={onClick} cursor='pointer'>
-            <HStack justify='space-between'>
-                <VStack align='start' spacing={1}>
-                    <Text fontSize='lg' fontWeight='bold'>{pair}</Text>
-                    <Text fontSize='sm' color='gray.400'>Gemini</Text>
-                </VStack>
+        <Card hover cursor='pointer' position='relative'>
+            <Box onClick={onClick}>
+                <HStack justify='space-between'>
+                    <VStack align='start' spacing={1}>
+                        <HStack>
+                            <Text fontSize='lg' fontWeight='bold'>{pair}</Text>
+                            <IconButton
+                                size='xs'
+                                icon={<Star size={14} fill={isInWatchlist ? '#faad14' : 'none'} color={isInWatchlist ? '#faad14' : colorMode === 'dark' ? 'gray' : 'gray.600'} />}
+                                variant='ghost'
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onToggleWatchlist();
+                                }}
+                                aria-label='Toggle watchlist'
+                            />
+                        </HStack>
+                        <Text fontSize='sm' color={colorMode === 'dark' ? 'gray.400' : 'gray.600'}>Gemini</Text>
+                    </VStack>
 
-                <VStack align='end' spacing={1}>
-                    <Text fontSize='xl' fontWeight='bold' color={isPositive ? 'success.light' : 'danger.light'}>
-                        {formatCurrency(parseFloat(price))}
-                    </Text>
-                    <PriceBadge change={parseFloat(change)} showIcon={false} />
-                </VStack>
-            </HStack>
+                    <VStack align='end' spacing={1}>
+                        <Text fontSize='xl' fontWeight='bold' color={isPositive ? 'success.500' : 'danger.500'}>
+                            {formatCurrency(parseFloat(price))}
+                        </Text>
+                        <PriceBadge change={parseFloat(change)} showIcon={false} />
+                    </VStack>
+                </HStack>
+            </Box>
         </Card>
     );
 };
 
 export const Markets = () => {
+    const { colorMode } = useColorMode();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearch = useDebounce(searchTerm, 300);
+    const { isInWatchlist, toggleWatchlist } = useWatchlist();
 
-    const { data: prices, loading, error } = usePolling(
+    const { data: prices, loading, error, lastUpdated, nextUpdate, refetch } = usePolling(
         getAllPrices,
         REFRESH_INTERVALS.PRICES
     );
@@ -78,12 +97,15 @@ export const Markets = () => {
             transition={{ duration: 0.5 }}
         >
             <VStack spacing={6} align='stretch'>
-                <Box>
-                    <Heading size='xl' mb={2} className='gradient-text'>
-                        All Markets
-                    </Heading>
-                    <Text color='gray.400'>Browse all available trading pairs</Text>
-                </Box>
+                <HStack justify='space-between' flexWrap='wrap' gap={4}>
+                    <Box>
+                        <Heading size='xl' mb={2} className='gradient-text'>
+                            All Markets
+                        </Heading>
+                        <Text color={colorMode === 'dark' ? 'gray.400' : 'gray.600'}>Browse all available trading pairs</Text>
+                    </Box>
+                    <RefreshIndicator lastUpdated={lastUpdated} nextUpdate={nextUpdate} onRefresh={refetch} />
+                </HStack>
 
                 <Card>
                     <InputGroup>
@@ -122,6 +144,8 @@ export const Markets = () => {
                                 price={item.price}
                                 change={item.percentChange24h}
                                 onClick={() => handleMarketClick(item.pair)}
+                                isInWatchlist={isInWatchlist(item.pair)}
+                                onToggleWatchlist={() => toggleWatchlist(item.pair)}
                             />
                         </MotionBox>
                     ))}
