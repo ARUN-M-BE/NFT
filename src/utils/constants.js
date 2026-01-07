@@ -32,12 +32,13 @@ export const CURRENCIES = [
     'AUD',
 ];
 
+// Updated refresh intervals - all set to 1 minute (60000ms) as requested
 export const REFRESH_INTERVALS = {
-    TICKER: 5000,      // 5 seconds
-    ORDER_BOOK: 3000,  // 3 seconds
-    TRADES: 5000,      // 5 seconds
-    PRICES: 10000,     // 10 seconds
-    CANDLES: 60000,    // 1 minute
+    TICKER: 60000,      // 1 minute
+    ORDER_BOOK: 60000,  // 1 minute
+    TRADES: 60000,      // 1 minute
+    PRICES: 60000,      // 1 minute
+    CANDLES: 60000,     // 1 minute
 };
 
 export const CHART_COLORS = {

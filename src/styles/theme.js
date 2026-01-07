@@ -49,12 +49,12 @@ const theme = extendTheme({
         },
     },
     styles: {
-        global: {
+        global: (props) => ({
             body: {
-                bg: 'gray.950',
-                color: 'white',
+                bg: props.colorMode === 'dark' ? 'gray.950' : 'gray.50',
+                color: props.colorMode === 'dark' ? 'white' : 'gray.900',
             },
-        },
+        }),
     },
     components: {
         Button: {
@@ -63,7 +63,7 @@ const theme = extendTheme({
                 borderRadius: 'lg',
             },
             variants: {
-                solid: {
+                solid: (props) => ({
                     bg: 'brand.500',
                     color: 'white',
                     _hover: {
@@ -72,23 +72,52 @@ const theme = extendTheme({
                         boxShadow: '0 4px 12px rgba(24, 144, 255, 0.4)',
                     },
                     transition: 'all 0.3s ease',
-                },
-                ghost: {
+                }),
+                ghost: (props) => ({
                     _hover: {
-                        bg: 'whiteAlpha.200',
+                        bg: props.colorMode === 'dark' ? 'whiteAlpha.200' : 'blackAlpha.100',
                     },
-                },
+                }),
             },
         },
         Card: {
-            baseStyle: {
+            baseStyle: (props) => ({
                 container: {
-                    bg: 'whiteAlpha.50',
+                    bg: props.colorMode === 'dark' ? 'whiteAlpha.50' : 'white',
                     backdropFilter: 'blur(10px)',
                     borderRadius: 'xl',
                     border: '1px solid',
-                    borderColor: 'whiteAlpha.100',
+                    borderColor: props.colorMode === 'dark' ? 'whiteAlpha.100' : 'gray.200',
+                    boxShadow: props.colorMode === 'dark' ? 'none' : 'sm',
                 },
+            }),
+        },
+    },
+    semanticTokens: {
+        colors: {
+            'glass-bg': {
+                default: 'whiteAlpha.900',
+                _dark: 'whiteAlpha.50',
+            },
+            'glass-border': {
+                default: 'gray.200',
+                _dark: 'whiteAlpha.100',
+            },
+            'text-primary': {
+                default: 'gray.900',
+                _dark: 'white',
+            },
+            'text-secondary': {
+                default: 'gray.600',
+                _dark: 'gray.400',
+            },
+            'bg-primary': {
+                default: 'white',
+                _dark: 'gray.950',
+            },
+            'bg-secondary': {
+                default: 'gray.50',
+                _dark: 'gray.900',
             },
         },
     },
