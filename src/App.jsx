@@ -17,6 +17,8 @@ import { AdminRoute } from './components/Auth/AdminRoute';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { UserProfile } from './pages/UserProfile';
 import { AdminUserData } from './pages/AdminUserData';
+import { SocialPage } from './pages/SocialPage';
+import { InsightsPage } from './pages/InsightsPage';
 
 function App() {
     return (
@@ -42,6 +44,8 @@ function App() {
                 <Route path='alerts' element={<AlertsPage />} />
                 <Route path='simulator' element={<SimulatorPage />} />
                 <Route path='profile' element={<UserProfile />} />
+                <Route path='social' element={<SocialPage />} />
+                <Route path='insights' element={<InsightsPage />} />
 
                 {/* Admin Routes */}
                 <Route path='admin' element={

@@ -11,6 +11,7 @@ import { PortfolioProvider } from './context/PortfolioContext';
 import { WatchlistProvider } from './context/WatchlistContext';
 import { AlertsProvider } from './context/AlertsContext';
 import { SimulatorProvider } from './context/SimulatorContext';
+import { WebSocketProvider } from './context/WebSocketContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
@@ -30,17 +31,19 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         },
                     }}
                 >
-                    <AuthProvider>
-                        <PortfolioProvider>
-                            <WatchlistProvider>
-                                <AlertsProvider>
-                                    <SimulatorProvider>
-                                        <App />
-                                    </SimulatorProvider>
-                                </AlertsProvider>
-                            </WatchlistProvider>
-                        </PortfolioProvider>
-                    </AuthProvider>
+                    <WebSocketProvider>
+                        <AuthProvider>
+                            <PortfolioProvider>
+                                <WatchlistProvider>
+                                    <AlertsProvider>
+                                        <SimulatorProvider>
+                                            <App />
+                                        </SimulatorProvider>
+                                    </AlertsProvider>
+                                </WatchlistProvider>
+                            </PortfolioProvider>
+                        </AuthProvider>
+                    </WebSocketProvider>
                 </ConfigProvider>
             </ChakraProvider>
         </BrowserRouter>

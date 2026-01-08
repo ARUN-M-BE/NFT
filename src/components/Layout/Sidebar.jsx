@@ -1,6 +1,6 @@
 import { Box, VStack, HStack, Text, Icon, Flex, useColorMode, Divider } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
-import { Home, TrendingUp, BarChart3, BookOpen, DollarSign, Percent, Briefcase, Star, Bell, Play, Shield, Users } from 'lucide-react';
+import { Home, TrendingUp, BarChart3, BookOpen, DollarSign, Percent, Briefcase, Star, Bell, Play, Shield, Users, BrainCircuit } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
@@ -19,6 +19,8 @@ const navItems = [
     { name: 'Watchlist', path: '/watchlist', icon: Star, section: 'trading' },
     { name: 'Alerts', path: '/alerts', icon: Bell, section: 'trading' },
     { name: 'Simulator', path: '/simulator', icon: Play, section: 'trading' },
+    { name: 'Social', path: '/social', icon: Users, section: 'community' },
+    { name: 'Insights', path: '/insights', icon: BrainCircuit, section: 'community' },
 ];
 
 export const Sidebar = () => {
@@ -44,6 +46,7 @@ export const Sidebar = () => {
 
     const mainItems = navItems.filter(item => item.section === 'main');
     const tradingItems = navItems.filter(item => item.section === 'trading');
+    const communityItems = navItems.filter(item => item.section === 'community');
 
     const NavItem = ({ item, isActive }) => (
         <MotionBox
@@ -126,6 +129,21 @@ export const Sidebar = () => {
                         ))}
                     </VStack>
                 </Box>
+
+                <Box>
+                    <Text fontSize='xs' fontWeight='bold' color={colorMode === 'dark' ? 'gray.500' : 'gray.400'} mb={2} px={4}>
+                        COMMUNITY & AI
+                    </Text>
+                    <VStack spacing={2} align='stretch'>
+                        {communityItems.map((item) => (
+                            <NavLink key={item.path} to={item.path} style={{ textDecoration: 'none' }}>
+                                {({ isActive }) => <NavItem item={item} isActive={isActive} />}
+                            </NavLink>
+                        ))}
+                    </VStack>
+                </Box>
+
+                <Divider />
 
                 {isAdmin && (
                     <>

@@ -345,3 +345,19 @@ body.chakra-ui-light {
     border: 1px solid #ccc !important;
   }
 }
+
+/* Blinking Crypto Cursor */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.cursor-blink {
+  animation: blink 1s infinite;
+  display: inline-block;
+  font-weight: bold;
+  opacity: 1;
+  color: #805AD5;
+  margin-left: 2px;
+}

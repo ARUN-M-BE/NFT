@@ -20,59 +20,65 @@ export const WebSocketProvider = ({ children }) => {
     const toast = useToast();
 
     useEffect(() => {
-        // Get WebSocket instance
-        wsRef.current = getWebSocketInstance();
+        try {
+            // Get WebSocket instance
+            const ws = getWebSocketInstance();
+            wsRef.current = ws;
 
-        // Status change handler
-        const unsubscribeStatus = wsRef.current.onStatusChange((newStatus) => {
-            setStatus(newStatus);
-
-            // Show notifications for important status changes
-            if (newStatus === 'connected') {
-                toast({
-                    title: 'Real-time connected',
-                    description: 'Live market data streaming active',
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                    position: 'bottom-right',
-                });
-            } else if (newStatus === 'failed') {
-                toast({
-                    title: 'Connection failed',
-                    description: 'Falling back to polling mode',
-                    status: 'warning',
-                    duration: 5000,
-                    isClosable: true,
-                    position: 'bottom-right',
-                });
+            if (!ws) {
+                console.error('Failed to initialize WebSocket instance');
+                setStatus('failed');
+                return;
             }
-        });
 
-        // Message handler
-        const unsubscribeMessage = wsRef.current.onMessage((data) => {
-            if (data.type === 'update' && data.symbol) {
-                setPrices(prev => ({
-                    ...prev,
-                    [data.symbol]: {
-                        price: data.price,
-                        change: data.change,
-                        timestamp: Date.now(),
-                    },
-                }));
-                setLastUpdate(Date.now());
-            }
-        });
+            // Status change handler
+            const unsubscribeStatus = ws.onStatusChange((newStatus) => {
+                setStatus(newStatus);
 
-        // Connect
-        wsRef.current.connect();
+                // Show notifications for important status changes
+                if (newStatus === 'connected') {
+                    toast({
+                        title: 'Real-time connected',
+                        description: 'Live market data streaming active',
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                        position: 'bottom-right',
+                    });
+                } else if (newStatus === 'failed') {
+                    // Specific toast for failure
+                    console.log('WebSocket connection failed - falling back to API');
+                }
+            });
 
-        // Cleanup
-        return () => {
-            unsubscribeStatus();
-            unsubscribeMessage();
-            // Don't disconnect on unmount to maintain connection across route changes
-        };
+            // Message handler
+            const unsubscribeMessage = ws.onMessage((data) => {
+                if (data.type === 'update' && data.symbol) {
+                    setPrices(prev => ({
+                        ...prev,
+                        [data.symbol]: {
+                            price: data.price,
+                            change: data.change,
+                            timestamp: Date.now(),
+                        },
+                    }));
+                    setLastUpdate(Date.now());
+                }
+            });
+
+            // Connect
+            ws.connect();
+
+            // Cleanup
+            return () => {
+                if (unsubscribeStatus) unsubscribeStatus();
+                if (unsubscribeMessage) unsubscribeMessage();
+                // Don't disconnect on unmount to maintain connection across route changes
+            };
+        } catch (error) {
+            console.error('WebSocket Context Error:', error);
+            setStatus('failed');
+        }
     }, [toast]);
 
     const subscribeToPair = (symbol) => {

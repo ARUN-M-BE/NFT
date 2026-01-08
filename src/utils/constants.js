@@ -1,7 +1,7 @@
 export const REFRESH_INTERVALS = {
-    PRICES: 60000, // 1 minute
-    TICKER: 30000, // 30 seconds
-    ORDER_BOOK: 5000, // 5 seconds
+    FAST: 10000,      // 10 seconds
+    STANDARD: 30000,  // 30 seconds (default)
+    SLOW: 60000,      // 60 seconds
     TRADES: 10000, // 10 seconds
     CANDLES: 60000, // 1 minute
 };

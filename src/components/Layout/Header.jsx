@@ -22,7 +22,7 @@ import {
     Divider,
     Button,
 } from '@chakra-ui/react';
-import { Moon, Sun, Search, Bell, Sparkles, Menu, LogOut } from 'lucide-react';
+import { Moon, Sun, Search, Bell, Sparkles, Menu, LogOut, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -39,12 +39,14 @@ const navItems = [
     { name: 'Watchlist', path: '/watchlist', icon: Star },
     { name: 'Alerts', path: '/alerts', icon: Bell },
     { name: 'Simulator', path: '/simulator', icon: Play },
+    { name: 'Social', path: '/social', icon: Users },
+    { name: 'Insights', path: '/insights', icon: Sparkles },
 ];
 
 export const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { logout } = useAuth();
+    const { signOut } = useAuth();
     const navigate = useNavigate();
 
     return (
@@ -182,12 +184,13 @@ export const Header = () => {
                             {/* Logout Button */}
                             <Button
                                 leftIcon={<LogOut size={18} />}
-                                onClick={() => {
-                                    logout();
+                                onClick={async () => {
+                                    await signOut();
                                     navigate('/login');
                                 }}
+                                colorScheme='red'
                                 variant='ghost'
-                                size='md'
+                                size='sm'
                                 borderRadius='xl'
                                 _hover={{
                                     bg: colorMode === 'dark' ? 'whiteAlpha.100' : 'blackAlpha.50',

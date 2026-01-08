@@ -7,7 +7,7 @@ export const CURRENCY_API_URL = import.meta.env.VITE_CURRENCY_API_URL || 'https:
 
 // Gemini API Configuration
 export const GEMINI_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.gemini.com/v1';
-export const REFRESH_INTERVAL = parseInt(import.meta.env.VITE_REFRESH_INTERVAL || '60000');
+export const REFRESH_INTERVAL = parseInt(import.meta.env.VITE_REFRESH_INTERVAL || '30000'); // 30 seconds
 
 // CoinMarketCap API Configuration
 export const COINMARKETCAP_API_KEY = import.meta.env.VITE_COINMARKETCAP_API_KEY || '';
