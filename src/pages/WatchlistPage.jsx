@@ -13,8 +13,7 @@ import {
 import { motion } from 'framer-motion';
 import { Star, TrendingUp, TrendingDown, X } from 'lucide-react';
 import { useWatchlist } from '@/context/WatchlistContext';
-import { usePolling } from '@/hooks/useGeminiAPI';
-import { getAllPrices } from '@/api';
+import { usePolling, getAllPrices } from '@/hooks/useGeminiAPI';
 import { Card } from '@/components/Common/Card';
 import { RefreshIndicator } from '@/components/Common/RefreshIndicator';
 import { PriceBadge } from '@/components/Common/PriceBadge';

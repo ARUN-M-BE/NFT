@@ -24,7 +24,6 @@ import {
 import { Moon, Sun, Search, Bell, Sparkles, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
-import { ConnectionStatus } from '../Common/ConnectionStatus';
 import { Home, TrendingUp, BarChart3, BookOpen, DollarSign, Percent, Briefcase, Star, Play } from 'lucide-react';
 
 const MotionFlex = motion(Flex);
@@ -149,11 +148,6 @@ export const Header = () => {
                                 />
                             </InputGroup>
 
-                            {/* Connection Status - Desktop Only */}
-                            <Box display={{ base: 'none', md: 'block' }}>
-                                <ConnectionStatus />
-                            </Box>
-
                             {/* Notification Button */}
                             <IconButton
                                 aria-label='Notifications'
@@ -250,11 +244,6 @@ export const Header = () => {
                             ))}
 
                             <Divider my={4} />
-
-                            {/* Connection Status in Mobile Menu */}
-                            <Box px={4}>
-                                <ConnectionStatus />
-                            </Box>
                         </VStack>
                     </DrawerBody>
                 </DrawerContent>

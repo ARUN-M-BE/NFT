@@ -93,28 +93,9 @@ export const geminiAPI = {
         }
     },
 
-    async getAllPrices() {
-        try {
-            const response = await geminiClient.get('v1/all-prices');
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching all prices:', error);
-            throw error;
-        }
-    },
-
-    async getCandle(symbol, timeframe = '1minute') {
-        try {
-            const response = await geminiClient.get(`/v2/candles/${symbol}/${timeframe}`);
-            return response.data;
-        } catch (error) {
-            console.error(`Error fetching candles for ${symbol}:`, error);
-            throw error;
-        }
-    },
-
     /**
-     * Get price feed
+     * Get price feed (all prices)
+     * This is the correct endpoint for getting all trading pair prices
      */
     async getPriceFeed() {
         try {
@@ -310,19 +291,28 @@ export const symbolToCoinId = (symbol) => {
 };
 
 /**
+ * Import CoinMarketCap API
+ */
+import { coinMarketCapAPI } from './endpoints/coinmarketcap';
+
+/**
  * API Source Selection
  * Use CoinGecko for main pages (no CORS issues)
  * Use Gemini for advanced features (with backend proxy if needed)
+ * Use CoinMarketCap for professional market data (requires API key)
  */
 export const API_SOURCE = {
     COINGECKO: 'coingecko',
     GEMINI: 'gemini',
+    COINMARKETCAP: 'coinmarketcap',
 };
 
 export default {
     gemini: geminiAPI,
     coinGecko: coinGeckoAPI,
+    coinMarketCap: coinMarketCapAPI,
     symbolToCoinId,
     COIN_ID_MAP,
     API_SOURCE,
 };
+

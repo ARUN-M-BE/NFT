@@ -3,10 +3,9 @@ import { Box, Heading, Text, Input, InputGroup, InputLeftElement, Grid, HStack, 
 import { Search, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { usePolling } from '@/hooks/useGeminiAPI';
+import { usePolling, getAllPrices } from '@/hooks/useGeminiAPI';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useWatchlist } from '@/context/WatchlistContext';
-import { getAllPrices } from '@/api';
 import { LoadingSpinner } from '@/components/Common/LoadingSpinner';
 import { Card } from '@/components/Common/Card';
 import { PriceBadge } from '@/components/Common/PriceBadge';

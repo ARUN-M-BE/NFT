@@ -17,8 +17,7 @@ import {
     Icon,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { usePolling } from '@/hooks/useGeminiAPI';
-import { getAllPrices } from '@/api';
+import { usePolling, getAllPrices } from '@/hooks/useGeminiAPI';
 import { Card } from '@/components/Common/Card';
 import { PriceBadge } from '@/components/Common/PriceBadge';
 import { RefreshIndicator } from '@/components/Common/RefreshIndicator';

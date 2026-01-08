@@ -9,14 +9,20 @@ export const CURRENCY_API_URL = import.meta.env.VITE_CURRENCY_API_URL || 'http:/
 export const GEMINI_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.gemini.com/v1';
 export const REFRESH_INTERVAL = parseInt(import.meta.env.VITE_REFRESH_INTERVAL || '60000');
 
+// CoinMarketCap API Configuration
+export const COINMARKETCAP_API_KEY = import.meta.env.VITE_COINMARKETCAP_API_KEY || '';
+export const COINMARKETCAP_API_BASE_URL = 'https://pro-api.coinmarketcap.com';
+
 // API Keys
 export const API_KEYS = {
     google: GOOGLE_API_KEY,
     currency: CURRENCY_API_KEY,
+    coinmarketcap: COINMARKETCAP_API_KEY,
 };
 
 // API URLs
 export const API_URLS = {
     gemini: GEMINI_API_BASE_URL,
     currency: CURRENCY_API_URL,
+    coinmarketcap: COINMARKETCAP_API_BASE_URL,
 };

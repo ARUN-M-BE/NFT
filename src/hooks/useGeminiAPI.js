@@ -194,3 +194,75 @@ export const getGeminiCandles = async (symbol, timeframe = '1day') => {
 export const getGeminiPriceFeed = async () => {
     return await geminiAPI.getPriceFeed();
 };
+
+/**
+ * CoinMarketCap API Functions
+ */
+
+export const getCMCAllPrices = async () => {
+    try {
+        const { coinMarketCap } = await import('@/api');
+        const response = await coinMarketCap.getLatestListings(100);
+
+        if (!response || !response.data) {
+            throw new Error('Invalid response from CoinMarketCap');
+        }
+
+        return response.data.map(coin => ({
+            pair: `${coin.symbol}USD`,
+            symbol: coin.symbol,
+            price: coin.quote.USD.price.toString(),
+            percentChange24h: coin.quote.USD.percent_change_24h?.toString() || '0',
+            volume: coin.quote.USD.volume_24h?.toString() || '0',
+            marketCap: coin.quote.USD.market_cap?.toString() || '0',
+            high24h: '0', // Not available in CMC
+            low24h: '0',  // Not available in CMC
+        }));
+    } catch (error) {
+        console.error('Error fetching CMC prices:', error);
+        // Fallback to CoinGecko
+        return await getAllPrices();
+    }
+};
+
+export const getCMCTickerV2 = async (symbol) => {
+    try {
+        const { coinMarketCap } = await import('@/api');
+        const response = await coinMarketCap.getQuotesLatest(symbol);
+
+        if (!response || !response.data || !response.data[symbol]) {
+            throw new Error(`No data for symbol: ${symbol}`);
+        }
+
+        const coinData = response.data[symbol];
+
+        return {
+            symbol: symbol.toUpperCase(),
+            open: coinData.quote.USD.price.toString(),
+            high: '0', // Not available
+            low: '0',  // Not available
+            close: coinData.quote.USD.price.toString(),
+            last: coinData.quote.USD.price.toString(),
+            changes: [coinData.quote.USD.percent_change_24h?.toString() || '0'],
+            change: coinData.quote.USD.percent_change_24h?.toString() || '0',
+            volume: {
+                [symbol]: coinData.quote.USD.volume_24h.toString(),
+            },
+        };
+    } catch (error) {
+        console.error(`Error fetching CMC ticker for ${symbol}:`, error);
+        // Fallback to CoinGecko
+        return await getTickerV2(symbol);
+    }
+};
+
+export const getCMCGlobalMetrics = async () => {
+    try {
+        const { coinMarketCap } = await import('@/api');
+        return await coinMarketCap.getGlobalMetrics();
+    } catch (error) {
+        console.error('Error fetching CMC global metrics:', error);
+        throw error;
+    }
+};
+
