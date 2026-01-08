@@ -32,7 +32,7 @@ import {
     useToast,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, TrendingUp, TrendingDown, PieChart } from 'lucide-react';
+import { Plus, Trash2, TrendingUp, TrendingDown, PieChart, FileText, Download } from 'lucide-react';
 import { useState } from 'react';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { usePolling } from '@/hooks/useGeminiAPI';
@@ -41,6 +41,7 @@ import { Card } from '@/components/Common/Card';
 import { RefreshIndicator } from '@/components/Common/RefreshIndicator';
 import { formatCurrency, formatPercentage } from '@/utils/formatters';
 import { REFRESH_INTERVALS } from '@/utils/constants';
+import { exportService } from '@/services/exportService';
 import { Cell, Pie, PieChart as RechartsPie, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const MotionBox = motion(Box);
@@ -106,8 +107,32 @@ export const PortfolioPage = () => {
                         </Text>
                     </Box>
 
-                    <HStack>
+                    <HStack spacing={2} flexWrap='wrap'>
                         <RefreshIndicator lastUpdated={lastUpdated} nextUpdate={nextUpdate} onRefresh={refetch} />
+                        <Button
+                            leftIcon={<FileText size={18} />}
+                            size='sm'
+                            variant='outline'
+                            onClick={() => exportService.exportPortfolioPDF({
+                                holdings,
+                                transactions,
+                                metrics: {
+                                    totalValue: portfolioValue,
+                                    totalPnL: plAmount,
+                                    pnlPercentage: plPercentage
+                                }
+                            })}
+                        >
+                            Export PDF
+                        </Button>
+                        <Button
+                            leftIcon={<Download size={18} />}
+                            size='sm'
+                            variant='outline'
+                            onClick={() => exportService.exportTransactionsCSV(transactions)}
+                        >
+                            Export CSV
+                        </Button>
                         <Button leftIcon={<Plus size={20} />} colorScheme='brand' onClick={onOpen}>
                             Add Holding
                         </Button>

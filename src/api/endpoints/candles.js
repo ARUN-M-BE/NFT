@@ -15,6 +15,15 @@ export const getCandles = async (symbol, timeframe = '1day') => {
         throw error;
     }
 };
+export const getCandle = async (symbol, timeframe = '1m') => {
+    try {
+        const response = await geminiClient.get(`/v2/candles/${symbol.toLowerCase()}/${timeframe}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching candle for ${symbol}:`, error);
+        throw error;
+    }
+};
 
 /**
  * Get derivative candle data for a symbol
@@ -31,3 +40,19 @@ export const getDerivativeCandles = async (symbol, timeframe = '1day') => {
         throw error;
     }
 };
+/**
+ * Get derivative candle data for a symbol
+ * @param {string} symbol - Trading symbol (e.g., 'btcusd')
+ * @param {string} timeframe - Timeframe (1m, 5m, 15m, 30m, 1hr, 6hr, 1day)
+ * @returns {Promise<Array<Array<number>>>} Array of candle arrays
+ */
+export const getDerivativeCandle = async (symbol, timeframe = '1m') => {
+    try {
+        const response = await geminiClient.get(`/v2/derivatives/candles/${symbol.toLowerCase()}/${timeframe}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching derivative candle for ${symbol}:`, error);
+        throw error;
+    }
+};
+

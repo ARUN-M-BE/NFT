@@ -221,12 +221,51 @@ npm run preview
 
 ### Environment Variables
 
-Create `.env` file:
+Create `.env` file or use the defaults from `src/config/api.js`:
 
 ```env
+# Google API (Maps, Places, Geocoding)
+VITE_GOOGLE_API_KEY=AIzaSyC97S3jv1i61h5fxlNkj8kCNH9EIrXofLM
+
+# Currency Layer API (Exchange Rates)
+VITE_CURRENCY_API_KEY=8a1cf3f4846bbd1edb965f899768b4d9
+VITE_CURRENCY_API_URL=http://apilayer.net/api/live
+
+# Gemini Exchange API
 VITE_API_BASE_URL=https://api.gemini.com/v1
 VITE_REFRESH_INTERVAL=60000
 ```
+
+**Note:** A template file `env.template.txt` is provided in the root directory.
+
+### API Configuration
+
+The dashboard integrates with multiple APIs:
+
+#### 1. **Google API** 
+- **Purpose**: Maps, Places, Geocoding services
+- **Key**: AIzaSyC97S3jv1i61h5fxlNkj8kCNH9EIrXofLM
+- **Configuration**: `src/config/api.js`
+
+#### 2. **Currency Layer API**
+- **Purpose**: Real-time currency exchange rates
+- **Key**: 8a1cf3f4846bbd1edb965f899768b4d9
+- **Service**: `src/api/currency.js`
+- **Features**:
+  - Live exchange rates for 100+ currencies
+  - Currency conversion
+  - Multi-currency support
+  - Automatic rate updates
+
+#### 3. **Gemini Exchange API**
+- **Purpose**: Cryptocurrency market data
+- **Base URL**: https://api.gemini.com/v1
+- **Features**:
+  - 444+ trading pairs
+  - Real-time price feeds
+  - Order book data
+  - Trade history
+  - No API key required for public endpoints
 
 ---
 

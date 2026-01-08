@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Grid, Heading, Text, HStack, VStack, Select, Tabs, TabList, TabPanels, Tab, TabPanel, Container } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
@@ -7,7 +7,7 @@ import { getTickerV2, getOrderBook, getTrades, getCandles } from '@/api';
 import { LoadingSpinner } from '@/components/Common/LoadingSpinner';
 import { Card } from '@/components/Common/Card';
 import { PriceBadge } from '@/components/Common/PriceBadge';
-import { TradingViewChart } from '@/components/Trading/TradingViewChart';
+import AdvancedChart from '@/components/Trading/AdvancedChart';
 import { formatCurrency, formatNumber, formatTime } from '@/utils/formatters';
 import { REFRESH_INTERVALS, TIMEFRAMES } from '@/utils/constants';
 
@@ -80,7 +80,7 @@ const TradesView = ({ symbol }) => {
 
 export const TradingPair = () => {
     const { symbol = 'btcusd' } = useParams();
-    const [timeframe, setTimeframe] = useState('1day');
+    const [timeframe, setTimeframe] = useState('1hr');
 
     const { data: ticker, loading: tickerLoading } = usePolling(
         () => getTickerV2(symbol),
@@ -96,7 +96,7 @@ export const TradingPair = () => {
         return <LoadingSpinner message='Loading trading data...' />;
     }
 
-    // Format candles for TradingView chart
+    // Format candles for AdvancedChart
     const chartData = candles?.map(candle => ({
         time: candle[0], // timestamp
         open: candle[1],
@@ -151,13 +151,18 @@ export const TradingPair = () => {
                         </Grid>
                     </Box>
 
-                    {/* TradingView Chart */}
+                    {/* Advanced Chart */}
                     {candlesLoading && !candles ? (
                         <Card>
                             <LoadingSpinner size='lg' message='Loading chart...' />
                         </Card>
                     ) : (
-                        <TradingViewChart symbol={symbol.toUpperCase()} data={chartData} />
+                        <AdvancedChart
+                            symbol={symbol.toUpperCase()}
+                            data={chartData}
+                            timeframe={timeframe}
+                            onTimeframeChange={setTimeframe}
+                        />
                     )}
 
                     <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>

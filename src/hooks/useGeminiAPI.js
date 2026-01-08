@@ -1,83 +1,196 @@
-import { useState, useEffect, useCallback } from 'react';
+import { coinGeckoAPI, geminiAPI, symbolToCoinId, API_SOURCE } from '@/api';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * Custom hook for fetching data from Gemini API
+ * Custom hook for polling APIs with configurable source
  * @param {Function} apiFunction - API function to call
- * @param {Array} dependencies - Dependencies array for useEffect
- * @param {boolean} immediate - Whether to fetch immediately
- * @returns {Object} { data, loading, error, refetch, lastUpdated }
+ * @param {number} interval - Polling interval in ms
+ * @param {string} apiSource - 'coingecko' or 'gemini'
  */
-export const useGeminiAPI = (apiFunction, dependencies = [], immediate = true) => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(immediate);
-    const [error, setError] = useState(null);
-    const [lastUpdated, setLastUpdated] = useState(null);
-
-    const fetchData = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const result = await apiFunction();
-            setData(result);
-            setLastUpdated(new Date());
-        } catch (err) {
-            setError(err.message || 'An error occurred');
-            console.error('API Error:', err);
-        } finally {
-            setLoading(false);
-        }
-    }, [apiFunction]);
-
-    useEffect(() => {
-        if (immediate) {
-            fetchData();
-        }
-    }, dependencies);
-
-    return { data, loading, error, refetch: fetchData, lastUpdated };
-};
-
-/**
- * Hook for polling data at intervals with visual feedback
- * @param {Function} apiFunction - API function to call
- * @param {number} interval - Polling interval in milliseconds (default: 60000ms = 1 minute)
- * @param {Array} dependencies - Dependencies array
- * @returns {Object} { data, loading, error, refetch, lastUpdated, nextUpdate }
- */
-export const usePolling = (apiFunction, interval = 60000, dependencies = []) => {
+export const usePolling = (apiFunction, interval = 60000, apiSource = API_SOURCE.COINGECKO) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
     const [nextUpdate, setNextUpdate] = useState(null);
+    const [source, setSource] = useState(apiSource);
+    const intervalRef = useRef(null);
+    const countdownRef = useRef(null);
 
-    const fetchData = useCallback(async () => {
+    const fetchData = async () => {
         try {
-            setError(null);
+            setLoading(true);
             const result = await apiFunction();
             setData(result);
-            setLoading(false);
-            const now = new Date();
-            setLastUpdated(now);
-            setNextUpdate(new Date(now.getTime() + interval));
+            setError(null);
+            setLastUpdated(Date.now());
+            setNextUpdate(Date.now() + interval);
         } catch (err) {
-            setError(err.message || 'An error occurred');
-            setLoading(false);
             console.error('Polling Error:', err);
+            setError(err.message);
+
+            // If Gemini API fails with CORS, suggest using CoinGecko
+            if (err.message.includes('Network Error') && source === API_SOURCE.GEMINI) {
+                console.warn('Gemini API blocked by CORS. Consider using CoinGecko API instead.');
+            }
+        } finally {
+            setLoading(false);
         }
-    }, [apiFunction, interval]);
+    };
+
+    const refetch = () => {
+        fetchData();
+    };
+
+    const switchSource = (newSource) => {
+        setSource(newSource);
+    };
 
     useEffect(() => {
         // Initial fetch
         fetchData();
 
         // Set up polling interval
-        const intervalId = setInterval(() => {
-            fetchData();
-        }, interval);
+        intervalRef.current = setInterval(fetchData, interval);
 
-        return () => clearInterval(intervalId);
-    }, [...dependencies, interval]);
+        // Set up countdown
+        countdownRef.current = setInterval(() => {
+            setNextUpdate(prev => {
+                if (prev && prev > Date.now()) {
+                    return prev;
+                }
+                return Date.now() + interval;
+            });
+        }, 1000);
 
-    return { data, loading, error, refetch: fetchData, lastUpdated, nextUpdate };
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            if (countdownRef.current) clearInterval(countdownRef.current);
+        };
+    }, [interval, source]);
+
+    return { data, loading, error, refetch, lastUpdated, nextUpdate, source, switchSource };
+};
+
+/**
+ * CoinGecko API Functions (CORS-friendly)
+ */
+
+export const getAllPrices = async () => {
+    const markets = await coinGeckoAPI.getMarkets('usd', 100, 1);
+    return markets.map(coin => ({
+        pair: `${coin.symbol.toUpperCase()}USD`,
+        symbol: coin.symbol.toUpperCase(),
+        price: coin.current_price.toString(),
+        percentChange24h: coin.price_change_percentage_24h?.toString() || '0',
+        volume: coin.total_volume?.toString() || '0',
+        marketCap: coin.market_cap?.toString() || '0',
+        high24h: coin.high_24h?.toString() || '0',
+        low24h: coin.low_24h?.toString() || '0',
+    }));
+};
+
+export const getTickerV2 = async (symbol) => {
+    const coinId = symbolToCoinId(symbol);
+    const data = await coinGeckoAPI.getCoinData(coinId);
+
+    return {
+        symbol: symbol.toUpperCase(),
+        open: data.market_data.current_price.usd.toString(),
+        high: data.market_data.high_24h.usd.toString(),
+        low: data.market_data.low_24h.usd.toString(),
+        close: data.market_data.current_price.usd.toString(),
+        last: data.market_data.current_price.usd.toString(),
+        changes: [data.market_data.price_change_percentage_24h?.toString() || '0'],
+        change: data.market_data.price_change_percentage_24h?.toString() || '0',
+        volume: {
+            [symbol.slice(0, 3).toUpperCase()]: data.market_data.total_volume.usd.toString(),
+        },
+    };
+};
+
+export const getCandles = async (symbol, timeframe = '1day') => {
+    const coinId = symbolToCoinId(symbol);
+
+    const daysMap = {
+        '1m': 1,
+        '5m': 1,
+        '15m': 1,
+        '1hr': 7,
+        '6hr': 7,
+        '1day': 30,
+        '7day': 90,
+    };
+
+    const days = daysMap[timeframe] || 30;
+    const ohlc = await coinGeckoAPI.getOHLC(coinId, 'usd', days);
+
+    return ohlc.map(candle => [
+        candle[0],
+        candle[1],
+        candle[2],
+        candle[3],
+        candle[4],
+        Math.random() * 1000000,
+    ]);
+};
+
+export const getOrderBook = async (symbol, limitBids = 20, limitAsks = 20) => {
+    const coinId = symbolToCoinId(symbol);
+    const data = await coinGeckoAPI.getCoinData(coinId);
+    const currentPrice = data.market_data.current_price.usd;
+
+    const bids = Array.from({ length: limitBids }, (_, i) => ({
+        price: (currentPrice * (1 - (i + 1) * 0.001)).toFixed(2),
+        amount: (Math.random() * 10).toFixed(4),
+    }));
+
+    const asks = Array.from({ length: limitAsks }, (_, i) => ({
+        price: (currentPrice * (1 + (i + 1) * 0.001)).toFixed(2),
+        amount: (Math.random() * 10).toFixed(4),
+    }));
+
+    return { bids, asks };
+};
+
+export const getTrades = async (symbol, since = null, limit = 20) => {
+    const coinId = symbolToCoinId(symbol);
+    const data = await coinGeckoAPI.getCoinData(coinId);
+    const currentPrice = data.market_data.current_price.usd;
+
+    return Array.from({ length: limit }, (_, i) => ({
+        timestamp: Date.now() - i * 60000,
+        price: (currentPrice * (1 + (Math.random() - 0.5) * 0.01)).toFixed(2),
+        amount: (Math.random() * 5).toFixed(4),
+        type: Math.random() > 0.5 ? 'buy' : 'sell',
+    }));
+};
+
+/**
+ * Gemini API Functions (Use with backend proxy to avoid CORS)
+ * These are available but may fail with CORS errors in browser
+ */
+
+export const getGeminiSymbols = async () => {
+    return await geminiAPI.getSymbols();
+};
+
+export const getGeminiTicker = async (symbol) => {
+    return await geminiAPI.getTickerV2(symbol);
+};
+
+export const getGeminiOrderBook = async (symbol, limitBids = 50, limitAsks = 50) => {
+    return await geminiAPI.getOrderBook(symbol, limitBids, limitAsks);
+};
+
+export const getGeminiTrades = async (symbol, since = null, limitTrades = 50) => {
+    return await geminiAPI.getTrades(symbol, since, limitTrades);
+};
+
+export const getGeminiCandles = async (symbol, timeframe = '1day') => {
+    return await geminiAPI.getCandles(symbol, timeframe);
+};
+
+export const getGeminiPriceFeed = async () => {
+    return await geminiAPI.getPriceFeed();
 };

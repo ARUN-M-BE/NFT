@@ -35,7 +35,7 @@ import {
     AlertIcon,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { Play, RotateCcw, TrendingUp, DollarSign, Activity, ShoppingCart, Trash2 } from 'lucide-react';
+import { Play, RotateCcw, TrendingUp, DollarSign, Activity, ShoppingCart, Trash2, Download } from 'lucide-react';
 import { useState } from 'react';
 import { useSimulator } from '@/context/SimulatorContext';
 import { usePolling } from '@/hooks/useGeminiAPI';
@@ -44,6 +44,7 @@ import { Card } from '@/components/Common/Card';
 import { RefreshIndicator } from '@/components/Common/RefreshIndicator';
 import { formatCurrency, formatPercentage, formatDateTime } from '@/utils/formatters';
 import { REFRESH_INTERVALS } from '@/utils/constants';
+import { exportService } from '@/services/exportService';
 
 const MotionBox = motion(Box);
 
@@ -146,8 +147,17 @@ export const SimulatorPage = () => {
                         </Text>
                     </Box>
 
-                    <HStack>
+                    <HStack spacing={2} flexWrap='wrap'>
                         <RefreshIndicator lastUpdated={lastUpdated} nextUpdate={nextUpdate} onRefresh={refetch} />
+                        <Button
+                            leftIcon={<Download size={18} />}
+                            size='sm'
+                            variant='outline'
+                            onClick={() => exportService.exportTradeHistoryCSV(tradeHistory)}
+                            isDisabled={tradeHistory.length === 0}
+                        >
+                            Export History
+                        </Button>
                         <Button leftIcon={<RotateCcw size={20} />} variant='outline' onClick={handleReset}>
                             Reset
                         </Button>
