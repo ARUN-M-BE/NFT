@@ -10,23 +10,35 @@ import { PortfolioPage } from './pages/PortfolioPage';
 import { WatchlistPage } from './pages/WatchlistPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { SimulatorPage } from './pages/SimulatorPage';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
+import { ProtectedRoute } from './components/Auth/ProtectedRoute';
 
 function App() {
     return (
-        <AppLayout>
-            <Routes>
-                <Route path='/' element={<Dashboard />} />
-                <Route path='/markets' element={<Markets />} />
-                <Route path='/trading/:symbol?' element={<TradingPair />} />
-                <Route path='/orderbook' element={<OrderBookPage />} />
-                <Route path='/funding' element={<FundingPage />} />
-                <Route path='/fee-promos' element={<FeePromosPage />} />
-                <Route path='/portfolio' element={<PortfolioPage />} />
-                <Route path='/watchlist' element={<WatchlistPage />} />
-                <Route path='/alerts' element={<AlertsPage />} />
-                <Route path='/simulator' element={<SimulatorPage />} />
-            </Routes>
-        </AppLayout>
+        <Routes>
+            {/* Public Routes */}
+            <Route path='/login' element={<Login />} />
+            <Route path='/signup' element={<Signup />} />
+
+            {/* Protected Routes */}
+            <Route path='/' element={
+                <ProtectedRoute>
+                    <AppLayout />
+                </ProtectedRoute>
+            }>
+                <Route index element={<Dashboard />} />
+                <Route path='markets' element={<Markets />} />
+                <Route path='trading/:symbol?' element={<TradingPair />} />
+                <Route path='orderbook' element={<OrderBookPage />} />
+                <Route path='funding' element={<FundingPage />} />
+                <Route path='fee-promos' element={<FeePromosPage />} />
+                <Route path='portfolio' element={<PortfolioPage />} />
+                <Route path='watchlist' element={<WatchlistPage />} />
+                <Route path='alerts' element={<AlertsPage />} />
+                <Route path='simulator' element={<SimulatorPage />} />
+            </Route>
+        </Routes>
     );
 }
 

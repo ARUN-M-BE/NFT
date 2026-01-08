@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { supabase } from '@/lib/supabaseClient';
 
 const AuthContext = createContext();
 
@@ -12,57 +12,63 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useLocalStorage('user', null);
-    const [isAuthenticated, setIsAuthenticated] = useState(!!user);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setIsAuthenticated(!!user);
-    }, [user]);
-
-    const login = async (email, password) => {
-        // Simulate API call
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const mockUser = {
-                    id: '1',
-                    email,
-                    name: email.split('@')[0],
-                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-                    createdAt: new Date().toISOString(),
-                };
-                setUser(mockUser);
-                resolve(mockUser);
-            }, 1000);
+        // Check active session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setLoading(false);
         });
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                setUser(session?.user ?? null);
+            }
+        );
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const signUp = async (email, password, fullName) => {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: { full_name: fullName }
+            }
+        });
+        return { data, error };
     };
 
-    const signup = async (email, password, name) => {
-        // Simulate API call
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const mockUser = {
-                    id: Date.now().toString(),
-                    email,
-                    name,
-                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-                    createdAt: new Date().toISOString(),
-                };
-                setUser(mockUser);
-                resolve(mockUser);
-            }, 1000);
+    const signIn = async (email, password) => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
         });
+        return { data, error };
     };
 
-    const logout = () => {
-        setUser(null);
+    const signOut = async () => {
+        const { error } = await supabase.auth.signOut();
+        return { error };
+    };
+
+    const resetPassword = async (email) => {
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+        return { data, error };
     };
 
     const value = {
         user,
-        isAuthenticated,
-        login,
-        signup,
-        logout,
+        loading,
+        signUp,
+        signIn,
+        signOut,
+        resetPassword,
+        isAuthenticated: !!user,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

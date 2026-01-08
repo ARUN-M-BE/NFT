@@ -20,6 +20,7 @@
 
 This is a **$100,000 production-ready** cryptocurrency trading dashboard featuring:
 
+- 🔐 **Supabase Authentication** - Secure JWT-based user authentication
 - ✨ **Premium Black/Gray Theme System** - Stunning dark mode with pure black backgrounds
 - 📊 **Real-Time Market Data** - Live prices updating every 60 seconds
 - 💼 **Portfolio Management** - Track holdings with real-time P&L calculations
@@ -27,6 +28,13 @@ This is a **$100,000 production-ready** cryptocurrency trading dashboard featuri
 - 🎮 **Trading Simulator** - Risk-free practice with $100K virtual balance
 - ⭐ **Watchlist System** - Quick access to favorite trading pairs
 - 🎨 **World-Class UI/UX** - Glassmorphism, animations, responsive design
+
+### 🎯 Demo Access
+
+**Quick Login:**
+- Email: `demo@allexchange.com`
+- Password: `demo123456`
+- Or click "Use Demo Account" button on login page
 
 ---
 

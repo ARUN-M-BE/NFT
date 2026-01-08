@@ -21,9 +21,10 @@ import {
     useDisclosure,
     Divider,
 } from '@chakra-ui/react';
-import { Moon, Sun, Search, Bell, Sparkles, Menu } from 'lucide-react';
+import { Moon, Sun, Search, Bell, Sparkles, Menu, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { Home, TrendingUp, BarChart3, BookOpen, DollarSign, Percent, Briefcase, Star, Play } from 'lucide-react';
 
 const MotionFlex = motion(Flex);
@@ -42,6 +43,8 @@ const navItems = [
 export const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
 
     return (
         <>
@@ -174,6 +177,24 @@ export const Header = () => {
                                     boxShadow='0 0 8px rgba(244, 67, 54, 0.6)'
                                 />
                             </IconButton>
+
+                            {/* Logout Button */}
+                            <Button
+                                leftIcon={<LogOut size={18} />}
+                                onClick={() => {
+                                    logout();
+                                    navigate('/login');
+                                }}
+                                variant='ghost'
+                                size='md'
+                                borderRadius='xl'
+                                _hover={{
+                                    bg: colorMode === 'dark' ? 'whiteAlpha.100' : 'blackAlpha.50',
+                                }}
+                                display={{ base: 'none', md: 'flex' }}
+                            >
+                                Logout
+                            </Button>
 
                             {/* Theme Toggle */}
                             <IconButton

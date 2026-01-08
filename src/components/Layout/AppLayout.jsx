@@ -1,8 +1,9 @@
 import { Box, Container, Flex } from '@chakra-ui/react';
+import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 
-export const AppLayout = ({ children }) => {
+export const AppLayout = () => {
     return (
         <Box minH='100vh'>
             <Header />
@@ -10,7 +11,7 @@ export const AppLayout = ({ children }) => {
                 <Flex gap={6}>
                     <Sidebar />
                     <Box flex={1} pb={8}>
-                        {children}
+                        <Outlet />
                     </Box>
                 </Flex>
             </Container>
