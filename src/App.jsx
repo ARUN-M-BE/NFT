@@ -13,6 +13,10 @@ import { SimulatorPage } from './pages/SimulatorPage';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { ProtectedRoute } from './components/Auth/ProtectedRoute';
+import { AdminRoute } from './components/Auth/AdminRoute';
+import { AdminDashboard } from './pages/AdminDashboard';
+import { UserProfile } from './pages/UserProfile';
+import { AdminUserData } from './pages/AdminUserData';
 
 function App() {
     return (
@@ -37,6 +41,19 @@ function App() {
                 <Route path='watchlist' element={<WatchlistPage />} />
                 <Route path='alerts' element={<AlertsPage />} />
                 <Route path='simulator' element={<SimulatorPage />} />
+                <Route path='profile' element={<UserProfile />} />
+
+                {/* Admin Routes */}
+                <Route path='admin' element={
+                    <AdminRoute>
+                        <AdminDashboard />
+                    </AdminRoute>
+                } />
+                <Route path='admin/users' element={
+                    <AdminRoute>
+                        <AdminUserData />
+                    </AdminRoute>
+                } />
             </Route>
         </Routes>
     );

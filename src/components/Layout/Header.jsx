@@ -20,6 +20,7 @@ import {
     DrawerCloseButton,
     useDisclosure,
     Divider,
+    Button,
 } from '@chakra-ui/react';
 import { Moon, Sun, Search, Bell, Sparkles, Menu, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';

@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   email TEXT UNIQUE,
   full_name TEXT,
   avatar_url TEXT,
+  role TEXT DEFAULT 'user' CHECK (role IN ('admin', 'user')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -28,6 +29,16 @@ CREATE POLICY "Users can view own profile"
 CREATE POLICY "Users can update own profile" 
   ON public.profiles FOR UPDATE 
   USING (auth.uid() = id);
+
+-- Admin policies
+CREATE POLICY "Admins can view all profiles" 
+  ON public.profiles FOR SELECT 
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
 
 -- =====================================================
 -- 2. CRYPTO ASSETS TABLE
@@ -63,6 +74,7 @@ CREATE TABLE IF NOT EXISTS public.user_portfolio (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   asset_id UUID REFERENCES public.crypto_assets ON DELETE CASCADE NOT NULL,
+  symbol TEXT NOT NULL,
   quantity DECIMAL(20, 8) NOT NULL CHECK (quantity > 0),
   average_buy_price DECIMAL(20, 8),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -99,6 +111,7 @@ CREATE TABLE IF NOT EXISTS public.user_watchlist (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   asset_id UUID REFERENCES public.crypto_assets ON DELETE CASCADE NOT NULL,
+  symbol TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(user_id, asset_id)
 );
@@ -128,6 +141,7 @@ CREATE TABLE IF NOT EXISTS public.price_alerts (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   asset_id UUID REFERENCES public.crypto_assets ON DELETE CASCADE NOT NULL,
+  symbol TEXT NOT NULL,
   target_price DECIMAL(20, 8) NOT NULL CHECK (target_price > 0),
   condition TEXT NOT NULL CHECK (condition IN ('above', 'below')),
   is_active BOOLEAN DEFAULT true,
@@ -166,6 +180,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   asset_id UUID REFERENCES public.crypto_assets ON DELETE CASCADE NOT NULL,
+  symbol TEXT NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('buy', 'sell')),
   quantity DECIMAL(20, 8) NOT NULL CHECK (quantity > 0),
   price DECIMAL(20, 8) NOT NULL CHECK (price > 0),

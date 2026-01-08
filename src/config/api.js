@@ -3,7 +3,7 @@ export const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || 'AIzaSyC97S
 
 // Currency Layer API Configuration
 export const CURRENCY_API_KEY = import.meta.env.VITE_CURRENCY_API_KEY || '8a1cf3f4846bbd1edb965f899768b4d9';
-export const CURRENCY_API_URL = import.meta.env.VITE_CURRENCY_API_URL || 'http://apilayer.net/api/live';
+export const CURRENCY_API_URL = import.meta.env.VITE_CURRENCY_API_URL || 'https://api.apilayer.com/currency_data/live';
 
 // Gemini API Configuration
 export const GEMINI_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.gemini.com/v1';
